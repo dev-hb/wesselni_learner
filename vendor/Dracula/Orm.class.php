@@ -6,9 +6,9 @@ class ORM {
     public function getConnection(){
         if($this->connection == null){
             // connect to database
-            // getting credentials from .env file
+            // getting credentials from .connection file
             $keywords = ['hostname', 'username', 'password', 'dbname'];
-            $env = explode(PHP_EOL, file_get_contents('.env'));
+            $env = explode(PHP_EOL, file_get_contents('.connection'));
             $credentials = [];
             foreach($env as $param){
                 if(preg_match("/(hostname|username|password|dbname)/", $param))
