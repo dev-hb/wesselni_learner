@@ -5,25 +5,30 @@ class Dracula
     private $id;
     private $connection;
     private $blueprint;
-    private $directory;
+    private $fields;
 
-    public function __construct($blueprint=null, $directory='models')
+    public function __construct($blueprint=null)
     {
         // create connection instance
         $orm = new ORM();
         $this->connection = $orm->getConnection();
         $this->blueprint = $blueprint;
-        $this->directory = $directory;
     }
 
-    public function getFields(){
-        require_once $this->directory."/".(ucfirst(strtolower($this->blueprint))).".php";
-        $class = new $this->blueprint;
-        $vars = get_class_vars(get_class($class));
-        $fields = [];
-        // extract fields names from vars keys
-        foreach ($vars as $key => $var) array_push($fields, $key);
-        return $fields;
+    /**
+     * @return mixed
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param mixed $fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
     }
 
     public function findAll(){
@@ -32,7 +37,7 @@ class Dracula
         // build sql request
         $sql = "SELECT ".$fields." FROM ".strtolower($this->blueprint);
         // fetch result then return in json format
-        return $this->query($sql, null);
+        return $this->query($sql);
     }
     
     public function find($keys, $values){
@@ -49,7 +54,7 @@ class Dracula
         if(count($result) == 1)
             return $result[0];
         if(count($result) > 1) return $result;
-        return null;
+        return array('err' => "No data found");
     }
 
     public function count($condition){
@@ -62,9 +67,9 @@ class Dracula
     public function delete($condition){
         // build sql request
         $sql = "DELETE FROM ".strtolower($this->blueprint)." WHERE ".$condition;
-        // fetch result then return in status code
+        // fetch result then return in json format
         $result = $this->queryUpdate($sql, null);
-        return $result ? 200: null;
+        return $result ? array('msg' => "Row deleted successfully") : array('err' => "Error deleting row");
     }
 
     public function insert($params){
@@ -79,7 +84,7 @@ class Dracula
         $sql = "INSERT INTO ".strtolower($this->blueprint)." ($fields) VALUES ($qm)";
         // fetch result then return in json format
         $result = $this->queryUpdate($sql, $values);
-        return $result ? $this->find($params[0], $params[1]): null;
+        return $result ? array('msg' => "Row inserted successfully") : array('err' => "Error inserting row");
     }
 
     public function update($params, $condition){
@@ -94,7 +99,7 @@ class Dracula
         // fetch result then return in json format
         array_push($values, $condition[1]);
         $result = $this->queryUpdate($sql, $values);
-        return $result ? 200: null;
+        return $result ? array('msg' => "Row updated successfully") : array('err' => "Error updating row");
     }
 
     public function queryUpdate($sql, $params=null){
@@ -118,7 +123,7 @@ class Dracula
         }
         $stmt->execute();
         $rs = $stmt->get_result();
-        return $rs->fetch_all(MYSQLI_ASSOC);
+        return $rs->fetch_all(MYSQLI_NUM);
     }
 
     /**
@@ -132,7 +137,7 @@ class Dracula
     /**
      * @param mixed $id
      */
-    public function setId($id): void
+    public function setId($id)
     {
         $this->id = $id;
     }
@@ -140,7 +145,7 @@ class Dracula
     /**
      * @return mysqli|null
      */
-    public function getConnection(): ?mysqli
+    public function getConnection()
     {
         return $this->connection;
     }
@@ -148,7 +153,7 @@ class Dracula
     /**
      * @param mysqli|null $connection
      */
-    public function setConnection(?mysqli $connection): void
+    public function setConnection($connection)
     {
         $this->connection = $connection;
     }
@@ -164,25 +169,9 @@ class Dracula
     /**
      * @param mixed $blueprint
      */
-    public function setBlueprint($blueprint): void
+    public function setBlueprint($blueprint)
     {
         $this->blueprint = $blueprint;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDirectory(): string
-    {
-        return $this->directory;
-    }
-
-    /**
-     * @param string $directory
-     */
-    public function setDirectory(string $directory): void
-    {
-        $this->directory = $directory;
     }
 
 }

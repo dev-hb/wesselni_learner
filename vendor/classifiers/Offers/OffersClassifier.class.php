@@ -1,17 +1,16 @@
 <?php
 
+use Phpml\Classification\MLPClassifier;
 
 class OffersClassifier  extends Classifier
 {
 
-    protected $data;
-    protected $regression;
-
     public function __construct($id = null)
     {
         parent::__construct($id);
-        $this->regression = new \Phpml\Regression\LeastSquares();
+        $this->classifier = new MLPClassifier(3, 7, ['a', 'b', 'c']);
         $this->dracula = new Dracula("offres");
+        $this->cities = (new Dracula("cities"))->findAll();
     }
 
     /**
@@ -24,28 +23,13 @@ class OffersClassifier  extends Classifier
     }
 
     /**
+     * @param $params parameters to predict
      * @return $this
      */
-    public function predict(){
-        // predict data
-
+    public function predict($params){
+        // nothing to predict for this class
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * @param mixed $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-    }
 
 }

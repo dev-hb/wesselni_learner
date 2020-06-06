@@ -6,6 +6,8 @@ abstract class Classifier {
     protected $id;
     protected $dracula;
     protected $prediction;
+    protected $data;
+    protected $classifier;
 
     public function __construct($id = null)
     {
@@ -58,6 +60,22 @@ abstract class Classifier {
     public function setPrediction($prediction)
     {
         $this->prediction = $prediction;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param mixed $data
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
     }
 
 }
