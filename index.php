@@ -30,19 +30,6 @@ if((new Helpers())->checkTokener()){
     (new AccessToken($action->getContext(), $token))->handle();
 }
 
-// if the client requested a URL source code
-if(isset($_GET['context'])){
-    if($_GET['context'] == "webget"){
-        $wget = new WebGet();
-        if(! isset($_GET['url'])){
-            (new Logger())->shout("please specify a url to be fetched");
-        }else{
-            $wget->setUrl($action->getParams()['url']);
-            (new Logger())->shout($wget->read()->replace()->getResponse());
-        }
-        die;
-    }
-}
 $context = $action->getContext();
 /// if the client requested for a text or JSON response
 $blueprint = $action->getContext();

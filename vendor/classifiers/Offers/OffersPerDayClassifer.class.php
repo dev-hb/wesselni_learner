@@ -12,10 +12,12 @@ class OffersPerDayClassifer extends OffersClassifier {
      */
     public function predict($params){
         // predict data
-        $dataset = $this->getData();
-        $targets = [];
-        foreach ($dataset as $sample) array_push($targets, 'true');
-        $this->classifier->train($dataset, $targets);
+        $vars = [];
+        $target = [];
+        foreach ($this->getTrainset() as $tr) $vars[] = [$tr['startcity'], $tr['targetcity'], $tr['dateTime']];
+        foreach ($this->getTrainset() as $tr) $target[] = [$tr['Y']];
+
+        $this->classifier->train($vars, $target);
         $this->prediction = $this->classifier->predict($params);
         return $this;
     }
@@ -33,5 +35,6 @@ class OffersPerDayClassifer extends OffersClassifier {
         echo "Total data trained : " . count($offersPerDayClassifier->getData());
         echo "<br />The predicted label is : " . $offersPerDayClassifier->getPrediction();
     }
+
 
 }
