@@ -24,7 +24,9 @@ class Template
                     $start_date = new DateTime($field['min']);
                     $end_date = new DateTime($field['max']);
                     $interval = $start_date->diff($end_date)->d;
-                    $rnd = rand(0, 31);
+                    do{
+                        $rnd = rand(0, 31);
+                    }while(in_array($rnd, [14, 15, 16, 21]));
                     $row[] = (new DateTime($field['min']))->add(new DateInterval("P$rnd"."D"))->format("Y-m-d");
                 break;
             }

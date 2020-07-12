@@ -14,8 +14,14 @@ class OffersPerMonthClassifier extends OffersClassifier {
     public function predict($params)
     {
         $predicted = [];
+        $temp = null;
         for($i=1;$i<31;$i++){
-            $predicted[] = parent::predict([
+            $temp = new OffersPerDayClassifer($i);
+            $temp->setTestset($this->getTrainset());
+            $temp->setTestset($this->getTestset());
+            $temp->setDracula($this->getDracula());
+            $temp->setData($this->getData());
+            $predicted[] = $temp->predict([
                 $params[0],
                 $params[1],
                 $i

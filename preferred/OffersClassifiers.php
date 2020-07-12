@@ -28,22 +28,36 @@ class OffersClassifiers extends PreferredHandler
                 );
                 break;
 
-            case 'offerspermonth':
+            case 'offersperduration':
+                $start = $this->getParams()['startdate'];
+                $end = $this->getParams()['enddate'];
                 $split = new Splitter(
                     (new Dracula('Offres'))->query(
-                        "SELECT startcity, targetcity, dateTime, count(*) Y FROM offres GROUP BY dateTime, targetcity, startcity"
+                        "SELECT startcity, targetcity, dateTime, count(*) Y FROM offres  GROUP BY dateTime, targetcity, startcity"
                     )
                 );
 
                 $train_set = $split->generate()->splitTrainFields(['startcity', 'targetcity', 'dateTime']);
-                $classifier = new OffersPerMonthClassifier(1);
+                $classifier = new OffersPerDayClassifer(1);
                 $classifier->setTrainset($train_set);
 
-                (new Logger())->json(
-                    [
-                        "Predicted number of travels" => ($classifier->predict([1, 9, 0])->getPrediction())
-                    ]
-                );
+                $data = [];
+
+                $nb_days = (new DateTime($this->getParams()['startdate']))
+                    ->diff(new DateTime($this->getParams()['enddate']))->days;
+
+                $starting_from = $split->dateToIntTransformer($this->getParams()['startdate']);
+
+                for($i=0; $i<$nb_days; $i++){
+                    $the_day = $starting_from + $i;
+                    $data[] = ceil(($classifier->predict([
+                            $this->getParams()['startcity'],
+                            $this->getParams()['targetcity'],
+                            $the_day
+                        ])->getPrediction()-2)*10);
+                }
+
+                (new Logger())->json($data);
                 break;
         }
     }
